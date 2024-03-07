@@ -18,6 +18,6 @@ class GetProfileController extends Controller
             return $this->handleResponse(status:true, message:'Profile '. $seeker->name , data: new GetProfileResource($seeker) );
 
         }
-    }
+}
 
 

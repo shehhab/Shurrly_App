@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Chat;
 
 use App\Models\Chat;
+use App\Models\Seeker;
+use App\Models\Advisor;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\chat\GetChatRequest;
 use App\Http\Requests\chat\StorChatRequest;
 use App\Http\Requests\chat\StoreChatRequest;
@@ -22,7 +25,7 @@ class ChatController extends Controller
 
 
 
-
+    // This function retrieves the conversations available to the current user
     public function index(GetChatRequest $request){
         $data = $request->validated();
         $isPrivate = 1 ;
@@ -48,29 +51,43 @@ class ChatController extends Controller
      */
 
 
-        // to store a new chat
+        // to store a new chat  , This function creates a new conversation
+        // if it does not already exist, otherwise returns the previous conversation
      public function store(StoreChatRequest $request): JsonResponse
      {
          $data = $this->prepareStoreData($request);
 
-         if ($data['seekerId'] === $data['otherSeekerId']) {
-             return $this->error('You cannot create a chat with yourself.');
-         }
+         // Retrieve the roles of both seeker and otherSeeker
+         $seekerRoles = Seeker::find($data['seekerId'])->roles()->pluck('name')->toArray();
+         $otherSeekerRoles = Seeker::find($data['otherSeekerId'])->roles()->pluck('name')->toArray();
 
-         $previousChat = $this->getPreviousChat($data['otherSeekerId']);
 
-         if ($previousChat === null) {
-             $chat = Chat::create($data['data']);
-             $chat->participants()->createMany([
-                 ['seeker_id' => $data['seekerId']],
-                 ['seeker_id' => $data['otherSeekerId']]
-             ]);
+                    // Check if the seeker is trying to talk to themselves
+                    if ($data['seekerId'] === $data['otherSeekerId']) {
+                        return $this->handleResponse(code :406 , status:false ,message:'You cannot create a chat with yourself.');
+                    }
 
-             $chat->refresh()->load('lastMessages.seeker', 'participants.seeker');
-             return $this->handleResponse($chat);
-         }
+                    // Check if the seeker is trying to talk to someone who only has the seeker role
+                    if (in_array('seeker', $otherSeekerRoles) && !in_array('advisor', $otherSeekerRoles)) {
+                        return $this->handleResponse(message: 'You must talk to someone who has both seeker and advisor roles.');
+                    }
 
-         return $this->handleResponse(data:$previousChat->load('lastMessages.seeker', 'participants.seeker'));
+         //The previous conversation is extracted if it exists
+    // Proceed with creating the chat
+    $previousChat = $this->getPreviousChat($data['otherSeekerId']);
+
+    if ($previousChat === null) {
+        $chat = Chat::create($data['data']);
+        $chat->participants()->createMany([
+            ['seeker_id' => $data['seekerId']],
+            ['seeker_id' => $data['otherSeekerId']]
+        ]);
+
+        $chat->refresh()->load('lastMessages.seeker', 'participants.seeker');
+        return $this->handleResponse($chat);
+    }
+
+    return $this->handleResponse(data:$previousChat->load('lastMessages.seeker', 'participants.seeker'));
      }
 
     /**
@@ -99,6 +116,8 @@ class ChatController extends Controller
      *@param StoreChatRequest $request
      *@return array
      */
+
+     //to get conversation old
     private function prepareStoreData(StoreChatRequest $request) :array
     {
         $data = $request->validated();
@@ -117,6 +136,7 @@ class ChatController extends Controller
      *@param chat $chat
      * @return JsonResponse
      */
+    //
     public function show(Chat $chat):JsonResponse
     {
 

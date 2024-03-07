@@ -18,7 +18,6 @@ class GetProfileResource extends JsonResource
             "name" =>(string) $this->whenHas('name'),
             "email" => (string) $this->whenHas('email'),
             "date_birth" => $dateOfBirth,
-
             'image'=> (string) $this->getFirstMediaUrl('seeker_profile_image')?:$defaultImage,
             "role" => $this->when($this->hasRole('seekre'), 'seeker', 'seeker'),
         ];
