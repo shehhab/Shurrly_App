@@ -17,12 +17,18 @@ class CreateAdvisorController extends Controller
     {
         $validatedData = $request->validated();
         $seeker = request()->user();
-    // Check if advisor already update data
-    $existingAdvisor = Advisor::where('seeker_id', $seeker->id)->first();
 
-    if ($existingAdvisor) {
-        return $this->handleResponse(message: 'You are already registered as an advisor Go to Login.', status: false ,code:422);
-    }
+        // Check if the user is authenticated
+        if (!$seeker) {
+            return $this->handleResponse(message: 'Unauthorized', status: false, code: 401);
+        }
+
+        // Check if advisor already updated data
+        $existingAdvisor = Advisor::where('seeker_id', $seeker->id)->first();
+
+        if ($existingAdvisor) {
+            return $this->handleResponse(message: 'You are already registered as an advisor. Please go to Login.', status: false, code: 422);
+        }
 
         if (!empty($request->skills) && !empty($dayRequest->days)) {
             $advisor = Advisor::create([
@@ -31,45 +37,33 @@ class CreateAdvisorController extends Controller
                 'Offere' => $validatedData['Offere'],
                 'seeker_id' =>  $seeker->id,
                 'available' => $validatedData['available'],
-                'approved' => false, // ! For Testing change to false after dashboard
+                'approved' => false, // For Testing. Change to false after dashboard
             ]);
 
-
-
-
-            // To add a new skill in table skill and update advisor skills
+            // To add a new skill in the skill table and update advisor skills
             $generatedSkills = [];
-            $advisorId = $seeker->id ;
-
             foreach ($request->skills as $skill) {
                 array_push($generatedSkills, Skill::firstOrCreate(['name' => $skill])->id);
             }
 
-            //FOR ADDING TO EDIT skill TO EDIT
-            $advisor = Advisor::where('id',$advisorId)->first();
             $advisor->skills()->attach($generatedSkills);
-                 // upload image
 
-        if ($request->hasFile('image')) {
+            // Upload image
+            if ($request->hasFile('image')) {
+                $advisor->addMediaFromRequest('image')->toMediaCollection('advisor_profile_image');
+            }
 
-            $advisor->addMediaFromRequest('image')->toMediaCollection('advisor_profile_image');
-        }
-        // upload video
+            // Upload video
+            if ($request->hasFile('video')) {
+                $advisor->addMediaFromRequest('video')->toMediaCollection('advisor_Intro_video');
+            }
 
-        if ($request->hasFile('video')) {
-
-            $advisor->addMediaFromRequest('video')->toMediaCollection('advisor_Intro_video');
-        }
-
-        if ($request->hasFile('certificates')) {
-
-            $advisor->addMediaFromRequest('certificates')->toMediaCollection('advisor_Certificates_PDF');
-        }
-
+            // Upload certificates
+            if ($request->hasFile('certificates')) {
+                $advisor->addMediaFromRequest('certificates')->toMediaCollection('advisor_Certificates_PDF');
+            }
 
             // Process days
-            $allDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-            $seeker->days()->delete();
             foreach ($dayRequest['days'] as $day) {
                 $from = strtotime($day['from']);
                 $to = strtotime($day['to']);
@@ -88,58 +82,31 @@ class CreateAdvisorController extends Controller
                     $totalBreakTime = abs($breakTo - $breakFrom);
                 }
 
-                // Calculate total time in hours
-                $totalHours = floor($to - $from) / 3600;
-
-                // Set break time based on total time
-                if ($totalHours >= 2 && $totalHours <= 4) {
-                    $maxBreakTime = 1800; // 30 minutes
-                } elseif ($totalHours > 4 && $totalHours <= 8) {
-                    $maxBreakTime = 3600; // 1 hour
-                } elseif ($totalHours > 8 && $totalHours <= 12) {
-                    $maxBreakTime = 9000; // 2.5 hours
-                } else {
-                    return $this->handleResponse(message: 'total time must be Two Hours or More', code: 400, status: false);
-                }
-
-                // Ensure break time does not exceed the maximum allowed
-                if ($totalBreakTime > $maxBreakTime) {
-                    return $this->handleResponse(message: 'Break time exceeds maximum allowed', code: 400, status: false);
-                }
-
                 // Create Day record
-                foreach ($request['days'] as $day) {
-                    $days = Day::create([
-                        'day' => $day['day'],
-                        'from' => $day['from'],
-                        'to' => $day['to'],
-                        'seeker_id' => $seeker->id,
-                        'available' => true,
-                        'total_time' =>  $totalTime,                // Total available time in datetime
-                        'break_from' => $day['break_from'] ?? null, //      store break_from
-                        'break_to' => $day['break_to'] ?? null,     //      store break_to
-                        'total_break_time' => gmdate('H:i', $totalBreakTime), // Total break time in datetime
+                $days = Day::create([
+                    'day' => $day['day'],
+                    'from' => $day['from'],
+                    'to' => $day['to'],
+                    'seeker_id' => $seeker->id,
+                    'available' => true,
+                    'total_time' => $totalTime, // Total available time in datetime
+                    'break_from' => $day['break_from'] ?? null, // Store break_from
+                    'break_to' => $day['break_to'] ?? null, // Store break_to
+                    'total_break_time' => gmdate('H:i', $totalBreakTime), // Total break time in datetime
+                ]);
+            }
 
-                    ]);
-                    unset($allDays[array_search($day['day'], $allDays)]);
-                }
+            $data = [
+                'message' => new UploadResources($advisor),
+                'days' => new DayResources(['days' => $seeker->days, 'offlineDays']),
+            ];
 
-                $data = [
-                    'message' => new UploadResources($advisor),
-                    'days' => new DayResources(['days' => $seeker->days, 'offlineDays']),
-                ];
-                return $this->handleResponse(
-                    message: 'Successfully Create Advisor',
-                    data:$data
-
-                );
-                    }
-    }
-
-        else {
+            return $this->handleResponse(
+                message: 'Successfully Create Advisor',
+                data: $data
+            );
+        } else {
             return $this->handleResponse(message: 'Skills and Days are required', status: false, code: 406);
         }
     }
 }
-
-

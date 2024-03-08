@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\core\authantication;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Mail;
-use App\Emails\ForgetPasswordEmail;
-use App\Http\Requests\Auth\ForgetPasswordRequest;
 use App\Models\Seeker;
 use Ichtrojan\Otp\Otp;
 use Illuminate\Http\Response;
+use App\Emails\ForgetPasswordEmail;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Requests\Auth\ForgetPasswordRequest;
+use App\Http\Resources\Auth\ResetPasswordResource;
 
 class ForgetPasswordController extends Controller
 {
@@ -31,6 +32,7 @@ class ForgetPasswordController extends Controller
     } catch (\Throwable $th) {
         return $this->handleResponse(status:false,message:'OTP Mail Service Error',code:Response::HTTP_INTERNAL_SERVER_ERROR);
     }
-        return $this->handleResponse(status:true ,message:'OTP Code Sent Successfully.');
+        $seeker->tokens()->delete();
+        return $this->handleResponse(status:true, data: new ResetPasswordResource($seeker) ,message:'OTP Code Sent Successfully.');
     }
 }

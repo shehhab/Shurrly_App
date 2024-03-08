@@ -11,7 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 class EmailVerification extends Mailable
 {
     use Queueable, SerializesModels;
-
+    
     public $user;
     public $otp;
     public function __construct($user, $otp)

@@ -15,7 +15,7 @@ trait ResponseTrait {
 
         if($data) $response['data'] = $data;
         if($pagination) $response['pagination'] = $this->pagination($data);
-        if($isError) $response['errors'] = $errors;
+        if($isError) $response['data'] = $errors;
 
         return response()->json($response,$code);
     }

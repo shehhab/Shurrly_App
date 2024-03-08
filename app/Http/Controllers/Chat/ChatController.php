@@ -53,42 +53,53 @@ class ChatController extends Controller
 
         // to store a new chat  , This function creates a new conversation
         // if it does not already exist, otherwise returns the previous conversation
-     public function store(StoreChatRequest $request): JsonResponse
-     {
-         $data = $this->prepareStoreData($request);
+        public function store(StoreChatRequest $request): JsonResponse
+        {
+            $data = $this->prepareStoreData($request);
+            $seekerRoles = Seeker::find($data['seekerId'])->roles()->pluck('name')->toArray();
+            $otherSeeker = Advisor::find($data['otherSeekerId']);
 
-         // Retrieve the roles of both seeker and otherSeeker
-         $seekerRoles = Seeker::find($data['seekerId'])->roles()->pluck('name')->toArray();
-         $otherSeekerRoles = Seeker::find($data['otherSeekerId'])->roles()->pluck('name')->toArray();
+            if ($otherSeeker !== null) {
+                $otherSeekerRoles = $otherSeeker->roles()->pluck('name')->toArray();
+            } else {
+                return $this->handleResponse(code: 404, status: false, message: 'Advisor not found.');
+            }
 
 
-                    // Check if the seeker is trying to talk to themselves
-                    if ($data['seekerId'] === $data['otherSeekerId']) {
-                        return $this->handleResponse(code :406 , status:false ,message:'You cannot create a chat with yourself.');
-                    }
+            // Check if the seekers are trying to talk to themselves
+            if ($data['seekerId'] === $data['otherSeekerId']) {
+                return $this->handleResponse(code: 406, status: false, message: 'You cannot create a chat with yourself.');
+            }
 
-                    // Check if the seeker is trying to talk to someone who only has the seeker role
-                    if (in_array('seeker', $otherSeekerRoles) && !in_array('advisor', $otherSeekerRoles)) {
-                        return $this->handleResponse(message: 'You must talk to someone who has both seeker and advisor roles.');
-                    }
 
-         //The previous conversation is extracted if it exists
-    // Proceed with creating the chat
-    $previousChat = $this->getPreviousChat($data['otherSeekerId']);
+            // Check if the seeker initiating the chat has a role
+            if (empty($otherSeekerRoles)) {
+                return $this->handleResponse(code: 406, status: false, message: 'You must chat only with advisor .');
+            }
 
-    if ($previousChat === null) {
-        $chat = Chat::create($data['data']);
-        $chat->participants()->createMany([
-            ['seeker_id' => $data['seekerId']],
-            ['seeker_id' => $data['otherSeekerId']]
-        ]);
+            // Proceed with creating the chat
 
-        $chat->refresh()->load('lastMessages.seeker', 'participants.seeker');
-        return $this->handleResponse($chat);
-    }
+            //The previous conversation is extracted if it exists
 
-    return $this->handleResponse(data:$previousChat->load('lastMessages.seeker', 'participants.seeker'));
-     }
+
+            $previousChat = $this->getPreviousChat($data['otherSeekerId']);
+
+            if ($previousChat === null) {
+                $chat = Chat::create($data['data']);
+                $chat->participants()->createMany([
+                    ['seeker_id' => $data['seekerId']],
+                    ['seeker_id' => $data['otherSeekerId']]
+                ]);
+
+                $chat->refresh()->load('lastMessages.seeker', 'participants.seeker');
+                return $this->handleResponse($chat);
+            }
+
+            return $this->handleResponse(data: $previousChat->load('lastMessages.seeker', 'participants.seeker'));
+
+
+        }
+
 
     /**
      * check if user and another user has previous chat or not

@@ -23,9 +23,8 @@ class UploadResources extends JsonResource
             'image' => $this->getFirstMediaUrl('advisor_profile_image'),
             'video' => $this->getFirstMediaUrl('advisor_Intro_video'),
             'certificates' => $this->getFirstMediaUrl('advisor_Certificates_PDF'),
-            "Skills" => $this->whenLoaded('Skills', function () {
-                return $this->Skills->pluck('name');
-            }),
+            'skills' => $this->skills->pluck('name'), // Assuming skills is a relationship in Advisor model
+
 
 
         ];

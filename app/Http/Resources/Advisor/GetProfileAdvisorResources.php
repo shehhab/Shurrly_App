@@ -14,6 +14,9 @@ class GetProfileAdvisorResources extends JsonResource
 
         $advisor =  Auth::id();
         $advisor = Advisor::find($advisor);
+        $skills = null; // Add this line to store skills data
+        $skills = $advisor->skills->pluck('name')->toArray(); // Get skills names and convert to array
+
        $media = $advisor->getFirstMediaUrl('advisor_profile_image');
        $certificates = $advisor->getFirstMediaUrl('advisor_Certificates_PDF');
 
@@ -30,7 +33,10 @@ class GetProfileAdvisorResources extends JsonResource
             'Offere' => $advisor->Offere,
             'expertise' => $advisor->expertise ,
             'bio' => $advisor->bio,
-            "role" => $this->hasRole('advisor') ? 'advisor' : ($this->hasRole('seeker') ? 'advisor' : 'seeker'),
+
+            "role" => $this->hasRole('advisor') ? 'advisor' : ($this->hasRole('advisor') ? 'advisor' : 'advisor'),
+            "skills" => $skills, // Add skills to the returned data
+
         ];
 
 

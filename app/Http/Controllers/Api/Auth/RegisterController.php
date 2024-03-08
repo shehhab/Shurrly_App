@@ -27,7 +27,7 @@ class RegisterController extends Controller
             'password' => Hash::make($validatedData['password']),
             'date_birth' => $validatedData['date_birth'],
         ]);
-        $seeker->assignRole('seeker');
+        //$seeker->assignRole('seeker');
 
         RateLimiter::hit('send-message:'.auth()->user());
 

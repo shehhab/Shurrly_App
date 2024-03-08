@@ -39,7 +39,4 @@ class MessageSent extends Notification
         ->setData('data', $messageData);
 
     }
-
-
-
 }

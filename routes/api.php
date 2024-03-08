@@ -102,12 +102,12 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function 
     //  API  routes core/auth
         Route::group(['prefix'=>'v1/core/auth' ],function(){
             Route::post('/forget_password', ForgetPasswordController::class);
-            Route::post('/reset_password', ResetPasswordController::class);
             Route::post('/resend_otp', ResendOTPCodeController::class);
 
-    // API routes for middleware core token authentication
+            // API routes for middleware core token authentication
             Route::group(['middleware'=>'auth:sanctum'],function(){
                 Route::post('/change_password', ChangePasswordController::class);
+                Route::post('/reset_password', ResetPasswordController::class);
                 Route::post('/delete_account', DeleteAccountController::class);
                 Route::post('/logout', LogoutController::class);
                 Route::post('/check_otp', ValidOTPController::class);

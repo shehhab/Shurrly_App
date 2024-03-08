@@ -15,13 +15,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(schedule $schedule)
     {
         $schedule->command('delete:unverified-accounts')->everyMinute();
-        $schedule->call(function () {
-            // Your logic for approving roles
-            $seekers = Seeker::where('approved', 1)->get();
-            foreach ($seekers as $seeker) {
-                $seeker->assignRole('advisor');
-            }
-        })->everyMinute();
+        
     }
     /**
      * Register the commands for the application.

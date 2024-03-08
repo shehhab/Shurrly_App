@@ -40,8 +40,9 @@ class UpdateProfileResources extends JsonResource
             'certificates' => $this->getFirstMediaUrl('advisor_Certificates_PDF'),
             'expertise' => $this->expertise,
             'Offere' => $this->Offere,
+            "role" => $this->hasRole('advisor') ? 'advisor' : ($this->hasRole('advisor') ? 'advisor' : 'advisor'),
             "Skills" => $this->Skills->pluck('name'),
-            "role" => $this->whenHas('role'),
+
         ];
     }
 }

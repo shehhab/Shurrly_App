@@ -31,7 +31,7 @@ class ChangePasswordController extends Controller
                 'status' => false,
                 'code' => 422,
                 'message' => 'Validation error',
-                'errors' => $validator->errors()->toArray()
+                'data' => $validator->errors()->toArray()
             ], 422);
         }
 
