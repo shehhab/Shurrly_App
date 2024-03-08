@@ -6,6 +6,7 @@ use Exception;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\Auth\HasErrorResource;
 use App\Http\Resources\Auth\LoginResource;
 use Illuminate\Support\Facades\RateLimiter;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
@@ -57,7 +58,13 @@ class LoginController extends Controller
         RateLimiter::hit('send-message:'.auth()->user());
 
         $date = [];
+<<<<<<< HEAD
         return $this->handleResponse(data:new HasErrorResource($date), code:401 ,status: false, message: 'Wrong Email Or Password!');
+=======
+        return $this->handleResponse(data:new HasErrorResource($date), status: false, message: 'Wrong Email Or Password!');
+
+
+>>>>>>> 75db2e7777af47b90166cda17646f0e4b1323d19
 
 
     }
