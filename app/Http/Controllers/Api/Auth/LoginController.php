@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api\Auth;
 
+use App\Http\Resources\Auth\HasErrorResource;
 use Exception;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +38,7 @@ class LoginController extends Controller
 
 
             if (!auth()->user()->email_verified_at) {
-                return $this->handleResponse(status:false,message:'Email not verified! Please verify your email.',data: new LoginResource($seeker));
+                return $this->handleResponse(status:false, code:406 ,message:'Email not verified! Please verify your email.',data: new LoginResource($seeker));
             }
 
             return $this->handleResponse(status:true,message:'Welcome Back '. $seeker->name , data: new LoginResource($seeker));
@@ -56,7 +57,7 @@ class LoginController extends Controller
         RateLimiter::hit('send-message:'.auth()->user());
 
         $date = [];
-        return $this->handleResponse(data: $date, status: false, message: 'Wrong Email Or Password!');
+        return $this->handleResponse(data:new HasErrorResource($date), code:401 ,status: false, message: 'Wrong Email Or Password!');
 
 
     }
