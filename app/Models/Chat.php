@@ -9,37 +9,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Chat extends Model
 {
     use HasFactory;
-        protected $table = "chats";
-        protected $quarded = ['id'];
-        protected $fillable = [
-            'otherSeekerId',
-            'created_by'
-            // Add other fillable attributes here if needed
-        ];
+    protected $fillable = [
+        'seeker_id',
+        'advisor_id'
 
-        public function participants() : HasMany
-        {
-            return $this->hasMany(ChatParticipant::class,'chat_id');
-
-        }
-        public function messages() : HasMany
-        {
-            return $this->hasMany(ChatMessage::class,'chat_id');
-
-        }
-        public function lastMessages()
-        {
-            return $this->hasOne(ChatMessage::class,'chat_id')->latest('updated_at');
-
-        }
-
-        public function scopeHasParticipant($query , $seekerId )
-        {
-            return $query->whereHas('participants' , function($q) use( $seekerId) {
-                $q->where('seeker_id', $seekerId) ;
-            }) ;
-
-        }
-
-
+    ];
+    public function advisor()
+    {
+        return $this->hasOne(Seeker::class, 'id', 'advisor_id');
+    }
+    public function seeker()
+    {
+        return $this->hasOne(Seeker::class, 'id', 'seeker_id');
+    }
+    public function messages(): HasMany
+    {
+        return $this->hasMany(ChatMessage::class, 'chat_id');
+    }
+    public function lastMessages()
+    {
+        return $this->hasOne(ChatMessage::class, 'chat_id')->latest('updated_at');
+    }
 }

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api\core\authantication;
+
 use Ichtrojan\Otp\Otp;
 use App\Traits\AuthResponse;
 use App\Http\Controllers\Controller;
@@ -22,13 +23,13 @@ class ResetPasswordController extends Controller
         $validatedData = $request->validated();
 
         // reset password logic
-        $otp2 = $this->otp->validate($validatedData['otp'], $validatedData['email']); // Corrected line
+        $otp2 = $this->otp->validate($validatedData['email'], $validatedData['otp']);
         if (!$otp2->status) {
             return $this->OTP_Error_Response();
         }
         $seeker = Seeker::where('email', $validatedData['email'])->first();
         $seeker->update(['password' => Hash::make($validatedData['password'])]);
-       // $seeker->tokens()->delete();
+        $seeker->tokens()->delete();
 
         return $this->OKResponse('Password Reset Successfully');
     }

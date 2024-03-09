@@ -23,16 +23,16 @@ class ForgetPasswordController extends Controller
 
         //creat a new OTP
         $otp = new Otp;
-        $code = $otp->generate($seeker->email, 'numeric', 4, 300);
+        $code = $otp->generate($validatedData['email'], 'numeric', 4, 5);
 
 
         //otp send email to user
         try {
-        Mail::to($seeker->email)->send(new ForgetPasswordEmail($seeker, $code->token));
-    } catch (\Throwable $th) {
-        return $this->handleResponse(status:false,message:'OTP Mail Service Error',code:Response::HTTP_INTERNAL_SERVER_ERROR);
-    }
+            Mail::to($seeker->email)->send(new ForgetPasswordEmail($seeker, $code->token));
+        } catch (\Throwable $th) {
+            return $this->handleResponse(status: false, message: 'OTP Mail Service Error', code: Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
         $seeker->tokens()->delete();
-        return $this->handleResponse(status:true, data: new ResetPasswordResource($seeker) ,message:'OTP Code Sent Successfully.');
+        return $this->handleResponse(status: true, message: 'OTP Code Sent Successfully.');
     }
 }

@@ -30,10 +30,10 @@ use App\Http\Controllers\Api\core\authantication\ResendOTPCodeController;
 use App\Http\Controllers\Api\core\authantication\ResetPasswordController;
 use App\Http\Controllers\Api\core\authantication\ChangePasswordController;
 use App\Http\Controllers\Api\core\authantication\ForgetPasswordController;
-use App\Http\Controllers\Chat\ChatController;
-use App\Http\Controllers\Chat\ChatMessageController;
-use App\Http\Controllers\Chat\SeekerController;
+use App\Http\Controllers\Api\Seeker\Chat\ChatController as ChatChatController;
+use App\Http\Controllers\Chat\{ChatController, ChatMessageController, SeekerController};
 
+use Pusher\Pusher;
 /*
     |--------------------------------------------------------------------------
     | API Routes
@@ -47,9 +47,37 @@ use App\Http\Controllers\Chat\SeekerController;
 //Route::post('/test',[TestController::class,'store']);
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function () {
-    Route::get('seeker', fn (Request $request) => $request->user())->name('seeker');
-;
+    Route::post('/broadcasting/auth', function (Request $request) {
+        $user = auth()->user(); // Get the authenticated user
 
+        // $channelName = 'presence-chat.{1}.1.2';
+        $channelName = $request->channelName;
+        $socketId = $request->input('socket_id');
+
+        $pusher = new Pusher(
+            config('broadcasting.connections.pusher.key'),
+            config('broadcasting.connections.pusher.secret'),
+            config('broadcasting.connections.pusher.app_id'),
+            [
+                'cluster' => config('broadcasting.connections.pusher.options.cluster'),
+                'encrypted' => true
+            ]
+        );
+
+        $presenceData = [
+            'user_id' => $user->id,
+            'user_info' => [
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+        ];
+
+        $auth = $pusher->presence_auth($channelName, $socketId, $user->id, $presenceData);
+
+        return response($auth);
+    });
+    Route::post('seeker-send-message', [ChatChatController::class, 'sendMessage']);
+    Route::get('seeker', fn (Request $request) => $request->user())->name('seeker');;
 });
 
 
@@ -57,59 +85,57 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function 
 
 //------------------------------------------Seeker-------------------------------------------------
 
-    //  API  routes seeker/auth
-    Route::group(['prefix'=>'v1/seeker/auth' ],function(){
-            //Route::post('/test',[TestController::class,'store']);   // !  my test PRIVATE
-            //Route::get('/test',[TestController::class,'test']);     // ! my test PRIVATE
-            Route::post('/register', RegisterController::class);
-            Route::post('/login', LoginController::class);
-            Route::post('login/{provider}', [SocialGoogle::class,'socialLogin']);
+//  API  routes seeker/auth
+Route::group(['prefix' => 'v1/seeker/auth'], function () {
+    //Route::post('/test',[TestController::class,'store']);   // !  my test PRIVATE
+    //Route::get('/test',[TestController::class,'test']);     // ! my test PRIVATE
+    Route::post('/register', RegisterController::class);
+    Route::post('/login', LoginController::class);
+    Route::post('login/{provider}', [SocialGoogle::class, 'socialLogin']);
 
 
-            // API routes for middleware seeker token authentication
-        Route::group(['middleware'=>'auth:sanctum'],function(){
-            Route::apiResource('chat', ChatController::class )->only('index','store','show');
+    // API routes for middleware seeker token authentication
+    Route::group(['middleware' => 'auth:sanctum'], function () {
+        Route::apiResource('chat', ChatController::class)->only('index', 'store', 'show');
 
-            Route::apiResource('chat_message', ChatMessageController::class )->only('index','store');
-            Route::apiResource('user', SeekerController::class )->only('index');
+        Route::apiResource('chat_message', ChatMessageController::class)->only('index', 'store');
+        Route::apiResource('user', SeekerController::class)->only('index');
 
 
-            Route::post('/verify_email', VerifyEmailController::class);
-                Route::post('/update/profile', UpdateProfileController::class);
-                Route::get('/getprofile', GetProfileController::class);
-            });
-        });
+        Route::post('/verify_email', VerifyEmailController::class);
+        Route::post('/update/profile', UpdateProfileController::class);
+        Route::get('/getprofile', GetProfileController::class);
+    });
+});
 
 
 //---------------------------------------------Advisor----------------------------------------------
 
 
-    //  API  routes advisor/auth
-    Route::group(['prefix'=>'v1/advisor/auth' ],function(){
-            Route::post('/login_advisor', LoginAdvisorController::class);
+//  API  routes advisor/auth
+Route::group(['prefix' => 'v1/advisor/auth'], function () {
+    Route::post('/login_advisor', LoginAdvisorController::class);
     // API routes for middleware advisor token authentication
-        Route::group(['middleware'=>'auth:sanctum'],function(){
-            Route::post('/create_advisor', CreateAdvisorController::class);
-            Route::post('/update_profile_advisor', UpdateProfileAdvisorController::class);
-            Route::get('/get_profile_advisor', GetProfileAdvisorController::class);
-
-        });
-
+    Route::group(['middleware' => 'auth:sanctum'], function () {
+        Route::post('/create_advisor', CreateAdvisorController::class);
+        Route::post('/update_profile_advisor', UpdateProfileAdvisorController::class);
+        Route::get('/get_profile_advisor', GetProfileAdvisorController::class);
     });
+});
 
 //-----------------------------------------------Core--------------------------------------------
 
-    //  API  routes core/auth
-        Route::group(['prefix'=>'v1/core/auth' ],function(){
-            Route::post('/forget_password', ForgetPasswordController::class);
-            Route::post('/resend_otp', ResendOTPCodeController::class);
+//  API  routes core/auth
+Route::group(['prefix' => 'v1/core/auth'], function () {
+    Route::post('/forget_password', ForgetPasswordController::class);
+    Route::post('/resend_otp', ResendOTPCodeController::class);
+    Route::post('/reset_password', ResetPasswordController::class);
+    Route::post('/check_otp', ValidOTPController::class);
 
-            // API routes for middleware core token authentication
-            Route::group(['middleware'=>'auth:sanctum'],function(){
-                Route::post('/change_password', ChangePasswordController::class);
-                Route::post('/reset_password', ResetPasswordController::class);
-                Route::post('/delete_account', DeleteAccountController::class);
-                Route::post('/logout', LogoutController::class);
-                Route::post('/check_otp', ValidOTPController::class);
-            });
-        });
+    // API routes for middleware core token authentication
+    Route::group(['middleware' => 'auth:sanctum'], function () {
+        Route::post('/change_password', ChangePasswordController::class);
+        Route::post('/delete_account', DeleteAccountController::class);
+        Route::post('/logout', LogoutController::class);
+    });
+});

@@ -10,26 +10,21 @@ class ChatMessage extends Model
 {
     use HasFactory;
 
-    protected $table = "chat_messages";
-    protected $quarded = ['id'];
-    protected $touches = ['chat'];
     protected $fillable = [
         'chat_id',
-        'seeker_id',
+        'isSeeker',
         'message'
-        // Add other fillable attributes here if needed
     ];
 
 
 
-    public function seeker() :BelongsTo
+    public function seeker(): BelongsTo
     {
-        return $this->belongsTo(Seeker::class,'seeker_id');
+        return $this->belongsTo(Seeker::class, 'seeker_id');
     }
 
-    public function chat() :BelongsTo
+    public function chat(): BelongsTo
     {
-        return $this->belongsTo(Chat::class,'chat_id');
+        return $this->belongsTo(Chat::class, 'chat_id');
     }
-
 }

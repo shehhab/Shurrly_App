@@ -13,10 +13,8 @@ return new class extends Migration
     {
         Schema::create('chats', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('created_by')->constrained('seekers')->cascadeOnDelete();
-            $table->string('name')->nullable();
-            //$table->integer('otherSeekerId')->nullable();
-            $table->boolean('is_private')->default(true);
+            $table->foreignId('seeker_id')->references('id')->on('seekers')->cascadeOnDelete();
+            $table->foreignId('advisor_id')->references('id')->on('seekers')->cascadeOnDelete();
             $table->timestamps();
         });
     }
