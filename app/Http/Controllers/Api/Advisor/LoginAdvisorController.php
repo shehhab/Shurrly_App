@@ -3,46 +3,50 @@
 namespace App\Http\Controllers\Api\Advisor;
 
 use Exception;
+use App\Models\Seeker;
 use App\Models\Advisor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Http\Resources\Auth\LoginResource;
 use App\Http\Resources\Advisor\DayResources;
 use App\Http\Resources\Advisor\LoginAdvisorResources;
 
 class LoginAdvisorController extends Controller
 {
-    public function __invoke(LoginRequest $request)
+    public function __invoke(LoginRequest $request , Exception $e)
     {
-        // Validate the incoming request data
         $validatedData = $request->validated();
 
-        // Attempt to authenticate the user
-        if (Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']])) {
-            $advisor = Auth::user();
-            $existingAdvisor = Advisor::where('seeker_id', $advisor->id)->first();
+        // Check for the existence of the Seeker
+        $seeker = Seeker::where('email', $validatedData['email'])->first();
 
-            // Check if the advisor account exists
-            if (!$existingAdvisor) {
-                return $this->handleResponse(status: false, message: 'Must create an advisor account.', code: 422);
+        if ($seeker) {
+            // Check for the existence of an Advisor associated with the Seeker
+            $advisor = Advisor::where('seeker_id', $seeker->id)->first();
+
+            if ($advisor) {
+                // If the user is associated with an Advisor and approval is granted, proceed with authentication
+                if ($advisor->approved == 1 && Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']])) {
+                    // Successful authentication, return the appropriate response
+                    return $this->handleResponse(status:true,message:'Login successful', data: new LoginAdvisorResources(Auth::user()));
+                } elseif ($advisor->approved == 0) {
+                    // If the account is not approved yet, return a message indicating to wait for approval
+                    return $this->handleResponse(status:false, code:403 ,message:'Your account is pending approval. Please wait for confirmation.', data: []);
+                } else {
+                    // If the password doesn't match, return the appropriate error message
+                    return $this->handleResponse(status:false, code:401 ,message:'Wrong Email Or Password!', data: []);
+                }
+            } else {
+                // If the user is not associated with an Advisor, deny access
+                return $this->handleResponse(status:false, code:403 ,message:'Access Denied! You are not an advisor. Please create an Advisor account.', data: []);
             }
-
-            // Check if the advisor account is approved
-            if ($existingAdvisor->approved === 0) {
-                return $this->handleResponse(status: false, message: 'Waiting for approval.');
-            }
-
-            // Prepare the response data
-            $data = [
-                'message' => new LoginAdvisorResources($advisor),
-                'days' => new DayResources(['days' => $advisor->days, 'offlineDays']),
-            ];
-
-            return $this->handleResponse(message: 'Welcome Back Advisor', data: $data);
+        } else {
+            // If the Seeker is not found, return the appropriate error message
+            return $this->handleResponse(status:false, code:404 ,message:'Account not found.', data: []);
         }
-
-        return $this->handleResponse(status: false, message: 'Wrong Email Or Password!');
     }
+
 
 }

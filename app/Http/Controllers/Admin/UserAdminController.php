@@ -12,10 +12,8 @@ class UserAdminController extends Controller
 {
     public function index(){
 
-        $data['users'] = Seeker::join('advisors', 'seekers.id', '=', 'advisors.seeker_id')
-        ->select('seekers.*', 'advisors.*')->where('approved' , False)->paginate(10);
-        $data['advisor'] = Advisor::first();
-        return view('admin.users.index', $data);
+        $advisors = Advisor::where('approved', false)->paginate(10);
+        return view('admin.users.index', compact('advisors'));
 
     }
 

@@ -49,7 +49,7 @@ class LoginController extends Controller
             $seconds = RateLimiter::availableIn('send-message:'.auth()->user());
 
 
-            return $this->handleResponse(status:false,message:'too Many Attempts , You may try again in '.$seconds.' seconds.' , code:429);
+            return $this->handleResponse(status:false,message:'too Many Attempts , You may try again in '.$seconds.'seconds.' , code:429);
 
 
         }

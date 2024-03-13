@@ -1,39 +1,42 @@
 <?php
 
+use Pusher\Pusher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
 // Api routes for controllers Auth
 use App\Http\Controllers\TestController;
+use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Api\Auth\SocialGoogle;
 use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\home\IndexController;
 use App\Http\Controllers\Api\Advisor\DayController;
 use App\Http\Controllers\Api\Auth\RegisterController;
 use App\Http\Controllers\Api\Auth\GetProfileController;
-use App\Http\Controllers\Api\Auth\VerifyEmailController;
-use App\Http\Controllers\Api\Auth\UpdateProfileController;
 
 // Api routes for controllers advisor
 
+use App\Http\Controllers\Api\Auth\VerifyEmailController;
+use App\Http\Controllers\Api\Auth\UpdateProfileController;
 use App\Http\Controllers\Api\Advisor\LoginAdvisorController;
-use App\Http\Controllers\Api\Advisor\CreateAdvisorController;
-use App\Http\Controllers\Api\Advisor\GetProfileAdvisorController;
 
 // Api routes for controllers core
 
+use App\Http\Controllers\Api\Advisor\CreateAdvisorController;
+use App\Http\Controllers\Api\Advisor\GetProfileAdvisorController;
 use App\Http\Controllers\Api\core\authantication\LogoutController;
 use App\Http\Controllers\Api\Advisor\UpdateProfileAdvisorController;
 use App\Http\Controllers\Api\core\authantication\ValidOTPController;
+use App\Http\Controllers\Api\home\HomeController as HomeHomeController;
 use App\Http\Controllers\Api\core\authantication\DeleteAccountController;
 use App\Http\Controllers\Api\core\authantication\ResendOTPCodeController;
 use App\Http\Controllers\Api\core\authantication\ResetPasswordController;
 use App\Http\Controllers\Api\core\authantication\ChangePasswordController;
 use App\Http\Controllers\Api\core\authantication\ForgetPasswordController;
+
 use App\Http\Controllers\Api\Seeker\Chat\ChatController as ChatChatController;
 use App\Http\Controllers\Chat\{ChatController, ChatMessageController, SeekerController};
-
-use Pusher\Pusher;
 /*
     |--------------------------------------------------------------------------
     | API Routes
@@ -138,4 +141,12 @@ Route::group(['prefix' => 'v1/core/auth'], function () {
         Route::post('/delete_account', DeleteAccountController::class);
         Route::post('/logout', LogoutController::class);
     });
+});
+
+
+
+
+Route::group(['prefix' => 'v1/home'], function () {
+
+        Route::get('', IndexController::class);
 });

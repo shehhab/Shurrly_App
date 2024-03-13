@@ -53,21 +53,21 @@
                         </tr>
                         </thead>
                         <tbody>
-                            @foreach ($users as $user)
+                            @foreach ($advisors  as $advisor)
 
                             <tr>
-                                <td>{{$user->id }}</td>
-                                <td>{{$user->name }}</td>
+                                <td>{{$advisor->id }}</td>
+                                <td>{{$advisor->name }}</td>
                                 <td>
-                                    @if ($user->approved)
+                                    @if ($advisor->approved)
                                     <span class="badge bg-success">Approved</span>
                                     @else
                                     <span class="badge bg-danger">Not Approved</span>
                                     @endif
                                 </td>
-                                <td>{{$user->bio }}</td>
-                                <td>{{$user->expertise }}</td>
-                                <td>{{$user->Offere }} $ </td>
+                                <td>{{$advisor->bio }}</td>
+                                <td>{{$advisor->expertise }}</td>
+                                <td>{{$advisor->Offere }} $ </td>
                                 <td style="/* CSS for image */
                                 .clickable-image {
                                     transition: transform 0.3s ease;
@@ -129,15 +129,15 @@
                                     </div>
                                 </td>
 
-                                <td>{{ \Carbon\Carbon::parse($user->create_at)->format('d-m-Y') }}</td>
+                                <td>{{ \Carbon\Carbon::parse($advisor->create_at)->format('d-m-Y') }}</td>
 
 
 
 
 
                                 <td>
-                                    @if (!$user->approved)
-                                        <form action="{{ route('admin.users.approve', $user->id) }}" method="POST">
+                                    @if (!$advisor->approved)
+                                        <form action="{{ route('admin.users.approve', $advisor->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <button type="submit" class="btn btn-success">Approve</button>
