@@ -7,7 +7,7 @@ use App\Models\Advisor;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-class IndexController extends Controller
+class HomeController extends Controller
 {
     public function __invoke(request $request){
 
