@@ -27,6 +27,7 @@ use App\Http\Controllers\Api\Advisor\CreateAdvisorController;
 use App\Http\Controllers\Api\Advisor\GetProfileAdvisorController;
 use App\Http\Controllers\Api\core\authantication\LogoutController;
 use App\Http\Controllers\Api\Advisor\UpdateProfileAdvisorController;
+use App\Http\Controllers\Api\Auth\HomeController as AuthHomeController;
 use App\Http\Controllers\Api\core\authantication\ValidOTPController;
 use App\Http\Controllers\Api\home\HomeController as HomeHomeController;
 use App\Http\Controllers\Api\core\authantication\DeleteAccountController;
@@ -148,6 +149,6 @@ Route::group(['prefix' => 'v1/core/auth'], function () {
 
 Route::group(['prefix' => 'v1/home'], function () {
 
-        Route::get('', HomeController::class);
+        Route::get('', AuthHomeController::class);
         //Route::get('', HomeHomeController::class);
 });
