@@ -145,8 +145,3 @@ Route::group(['prefix' => 'v1/core/auth'], function () {
 
 
 
-
-Route::group(['prefix' => 'v1/home'], function () {
-
-        Route::get('', HomeHomeController::class);
-});
