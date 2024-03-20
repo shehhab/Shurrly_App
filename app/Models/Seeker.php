@@ -69,6 +69,11 @@ class Seeker extends Authenticatable implements HasMedia
     {
         return $this->hasMany(Chat::class,'created_by');
     }
+        // Define the relationship with saved products
+        public function savedProducts()
+        {
+            return $this->belongsToMany(Product::class, 'saved_products', 'seeker_id', 'product_id')->withTimestamps();
+        }
 
     public function routeNotificationForOneSignel(): array
     {

@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use Illuminate\Http\Response;
 
+
 trait AuthResponse
 {
     public function RegisterResponse($user, $token)
@@ -44,7 +45,7 @@ trait AuthResponse
             $formattedErrors[$field] = implode(' ', $messages);
         }
         $response = [
-            'errors' => $formattedErrors,
+            'data' => $formattedErrors,
             'message' => 'validation errors',
             'status' => false,
             'code' => Response::HTTP_UNPROCESSABLE_ENTITY,

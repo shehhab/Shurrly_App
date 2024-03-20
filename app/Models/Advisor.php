@@ -16,8 +16,12 @@ class Advisor extends Model implements HasMedia
         'bio',
         'expertise',
         'seeker_id',
-        'Offere',
-        'approved'
+        'offere',
+        'language',
+        'country',
+        'approved',
+        'category_id'
+
     ];
 
     //upload advisor_profile_image
@@ -41,7 +45,7 @@ class Advisor extends Model implements HasMedia
     // * Relationship
     public function seeker()
     {
-        return $this->hasOne(Seeker::class);
+        return $this->belongsTo(Seeker::class);
     }
 
     public function Day()
@@ -53,4 +57,17 @@ class Advisor extends Model implements HasMedia
     {
         return $this->belongsToMany(Skill::class);
     }
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+
+        //$projects = $advisor->projects;
+
+        //$advisor = $product->advisor;
+    }
+
 }

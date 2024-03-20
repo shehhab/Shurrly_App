@@ -171,6 +171,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
+        Owenoj\LaravelGetId3\GetId3ServiceProvider::class,
 
     ])->toArray(),
 

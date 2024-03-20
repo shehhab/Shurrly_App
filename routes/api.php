@@ -6,37 +6,42 @@ use Illuminate\Support\Facades\Route;
 
 
 // Api routes for controllers Auth
-use App\Http\Controllers\TestController;
-use App\Http\Controllers\Admin\HomeController;
-use App\Http\Controllers\Api\Auth\SocialGoogle;
-use App\Http\Controllers\Api\Auth\LoginController;
-use App\Http\Controllers\Api\home\IndexController;
-use App\Http\Controllers\Api\Advisor\DayController;
-use App\Http\Controllers\Api\Auth\RegisterController;
-use App\Http\Controllers\Api\Auth\GetProfileController;
+use App\Http\Controllers\Api\Seeker\Auth\SocialGoogle;
+
 
 // Api routes for controllers advisor
-
-use App\Http\Controllers\Api\Auth\VerifyEmailController;
-use App\Http\Controllers\Api\Auth\UpdateProfileController;
+use App\Http\Controllers\Api\Seeker\Home\HomeController;
+use App\Http\Controllers\Api\Seeker\Auth\LoginController;
+use App\Http\Controllers\Api\Seeker\Home\SearchController;
 use App\Http\Controllers\Api\Advisor\LoginAdvisorController;
+
+
+// Api routes for controllers seeker
+
+use App\Http\Controllers\Api\Seeker\Auth\RegisterController;
+use App\Http\Controllers\Api\Advisor\CreateAdvisorController;
+use App\Http\Controllers\Api\Seeker\Explore\ExploreController;
+use App\Http\Controllers\Api\Seeker\Auth\VerifyEmailController;
+use App\Http\Controllers\Api\Advisor\GetProfileAdvisorController;
+use App\Http\Controllers\Api\Seeker\Profile\GetProfileController;
+use App\Http\Controllers\Api\Advisor\Product\AddProductController;
+use App\Http\Controllers\Api\core\authantication\LogoutController;
 
 // Api routes for controllers core
 
-use App\Http\Controllers\Api\Advisor\CreateAdvisorController;
-use App\Http\Controllers\Api\Advisor\GetProfileAdvisorController;
-use App\Http\Controllers\Api\core\authantication\LogoutController;
+use App\Http\Controllers\Api\Seeker\Explore\PageProductController;
 use App\Http\Controllers\Api\Advisor\UpdateProfileAdvisorController;
-use App\Http\Controllers\Api\Auth\HomeController as AuthHomeController;
 use App\Http\Controllers\Api\core\authantication\ValidOTPController;
-use App\Http\Controllers\Api\home\HomeController as HomeHomeController;
+use App\Http\Controllers\Api\Seeker\Profile\UpdateProfileController;
 use App\Http\Controllers\Api\core\authantication\DeleteAccountController;
 use App\Http\Controllers\Api\core\authantication\ResendOTPCodeController;
 use App\Http\Controllers\Api\core\authantication\ResetPasswordController;
+
 use App\Http\Controllers\Api\core\authantication\ChangePasswordController;
 use App\Http\Controllers\Api\core\authantication\ForgetPasswordController;
-
 use App\Http\Controllers\Api\Seeker\Chat\ChatController as ChatChatController;
+use App\Http\Controllers\Api\Seeker\Explore\UnSave_SaveProductController;
+use App\Http\Controllers\Api\Seeker\Explore\ViewProductSavedController;
 use App\Http\Controllers\Chat\{ChatController, ChatMessageController, SeekerController};
 /*
     |--------------------------------------------------------------------------
@@ -109,6 +114,9 @@ Route::group(['prefix' => 'v1/seeker/auth'], function () {
         Route::post('/verify_email', VerifyEmailController::class);
         Route::post('/update/profile', UpdateProfileController::class);
         Route::get('/getprofile', GetProfileController::class);
+
+        Route::get('/saved_products', ViewProductSavedController::class);
+
     });
 });
 
@@ -119,11 +127,15 @@ Route::group(['prefix' => 'v1/seeker/auth'], function () {
 //  API  routes advisor/auth
 Route::group(['prefix' => 'v1/advisor/auth'], function () {
     Route::post('/login_advisor', LoginAdvisorController::class);
+    Route::get('/get_profile_advisor', GetProfileAdvisorController::class);
+
+
     // API routes for middleware advisor token authentication
     Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/create_advisor', CreateAdvisorController::class);
         Route::post('/update_profile_advisor', UpdateProfileAdvisorController::class);
-        Route::get('/get_profile_advisor', GetProfileAdvisorController::class);
+        Route::post('/add_products', AddProductController::class);
+
     });
 });
 
@@ -149,6 +161,18 @@ Route::group(['prefix' => 'v1/core/auth'], function () {
 
 Route::group(['prefix' => 'v1/home'], function () {
 
-        Route::get('', AuthHomeController::class);
-        //Route::get('', HomeHomeController::class);
+        Route::get('', HomeController::class);
+        Route::get('/search', SearchController::class);
+
+        Route::get('/Explore', ExploreController::class);
+        Route::post('/product_page', PageProductController::class);
+
+        Route::group(['middleware' => 'auth:sanctum'], function () {
+
+        Route::post('/save-or-unsave-product', UnSave_SaveProductController::class);
+
+
+    });
+
+
 });

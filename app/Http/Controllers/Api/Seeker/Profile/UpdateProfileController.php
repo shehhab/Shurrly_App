@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\Seeker\Profile;
 
 use Carbon\Carbon;
 use App\Models\Seeker;

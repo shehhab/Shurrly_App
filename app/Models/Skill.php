@@ -8,11 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class Skill extends Model
 {
     use HasFactory;
-    protected $fillable = ['name','public'];
+    protected $fillable = ['name',
+    'public',
+    "categories_id"
+];
 
     // * Relationship
 
     public function advisors(){
         return $this->belongsToMany(Advisor::class);
     }
+
+    public function categories(){
+        return $this->belongsTo(Category::class,'categories_id');
+    }
+
+
+
+
 }

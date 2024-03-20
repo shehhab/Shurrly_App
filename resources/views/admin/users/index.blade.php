@@ -41,7 +41,6 @@
                         <th>Name</th>
                         <th>Active</th>
                         <th>bio</th>
-                        <th>expertise</th>
                         <th>Offere</th>
 
                         <th>IMG</th>
@@ -66,7 +65,6 @@
                                     @endif
                                 </td>
                                 <td>{{$advisor->bio }}</td>
-                                <td>{{$advisor->expertise }}</td>
                                 <td>{{$advisor->Offere }} $ </td>
                                 <td style="/* CSS for image */
                                 .clickable-image {
@@ -136,8 +134,14 @@
 
 
                                 <td>
+                                    <div class="d-flex">
+                                        <form action="{{route('admin.users.destroy', $advisor->id) }}" method="POST" class="me-2">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger me-2" style="margin-right:20px"><i class="fas fa-trash"></i></button>
+                                        </form>
                                     @if (!$advisor->approved)
-                                        <form action="{{ route('admin.users.approve', $advisor->id) }}" method="POST">
+                                        <form action="{{route('admin.users.approve', $advisor->id) }}" method="POST">
                                             @csrf
                                             @method('PUT')
                                             <button type="submit" class="btn btn-success">Approve</button>
@@ -145,6 +149,7 @@
                                     @else
                                         <span class="badge bg-success">Approved</span>
                                     @endif
+                                    </div>
                                 </td>
 
 

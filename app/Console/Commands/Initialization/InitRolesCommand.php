@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands\Initialization;
 
+use App\Models\Category;
 use Illuminate\Console\Command;
 use Spatie\Permission\Models\Role;
 
@@ -40,6 +41,13 @@ class InitRolesCommand extends Command
             'guard'=>'web'
         ]);
 
+        Category::create([
+            'name' => 'bussniss',
+        ]);
+
+        $this->info('Update DataBase successfully.');
         return;
+
     }
+
 }

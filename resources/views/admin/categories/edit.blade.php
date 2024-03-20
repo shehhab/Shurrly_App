@@ -8,10 +8,10 @@
 <div class="container py-5">
     <div class="row">
         <div class="col-md-6 offset-md-3">
-            <h3 class="mb-3">Edit Product</h3>
+            <h3 class="mb-3">Edit Skills</h3>
             <div class="card">
                 <div class="card-body p-5">
-                    <label for="name">Category Name:</label>
+                    <label for="name">Skill Name:</label>
 
                     <form action="{{ route('categories.update', $category->id) }}" method="POST">
                         @csrf

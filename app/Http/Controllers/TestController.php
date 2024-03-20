@@ -36,7 +36,5 @@ class TestController extends Controller
             $q->where('name','LIKE','%'.$request->name.'%');
         });
     }
-
-
-
+    
 }

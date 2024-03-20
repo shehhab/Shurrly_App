@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Api\Advisor;
 
+use App\Models\Day;
 use App\Models\Skill;
 use App\Models\Advisor;
-use App\Models\Day;
+use App\Models\Category;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Advisor\UploadResources;
-use App\Http\Requests\Advisor\CreateAdvisorRequest;
 use App\Http\Requests\Advisor\DayRequest;
 use App\Http\Resources\Advisor\DayResources;
+use App\Http\Resources\Advisor\UploadResources;
+use App\Http\Requests\Advisor\CreateAdvisorRequest;
 
 class CreateAdvisorController extends Controller
 {
@@ -30,23 +31,32 @@ class CreateAdvisorController extends Controller
             return $this->handleResponse(message: 'You are already registered as an advisor. Please go to Login.', status: false, code: 422);
         }
 
-        if (!empty($request->skills) && !empty($dayRequest->days)) {
+
+
+
+        if (!empty($dayRequest->days)) {
             $advisor = Advisor::create([
                 'bio' => $validatedData['bio'],
-                'expertise' => $validatedData['expertise'],
-                'Offere' => $validatedData['Offere'],
+                'language' => $validatedData['language'],
+                'country' => $validatedData['country'],
+                'offere' => $validatedData['offere'],
                 'seeker_id' =>  $seeker->id,
                 'available' => $validatedData['available'],
-                'approved' => false, // For Testing. Change to false after dashboard
+                'approved' => false,
+                'categories_id' => $validatedData['categories_id'], 
             ]);
 
-            // To add a new skill in the skill table and update advisor skills
-            $generatedSkills = [];
-            foreach ($request->skills as $skill) {
-                array_push($generatedSkills, Skill::firstOrCreate(['name' => $skill])->id);
+            foreach ($request->skills as $skillName) {
+                // Find or create the skill
+                $skill = Skill::firstOrCreate(['name' => $skillName, 'categories_id' => $validatedData['categories_id']]);
+
+                // Associate the skill with the advisor
+                $advisor->skills()->attach($skill->id);
             }
 
-            $advisor->skills()->attach($generatedSkills);
+            // Associate the advisor with the category
+            $advisor->category()->associate($validatedData['categories_id']);
+            $advisor->save();
 
             // Upload image
             if ($request->hasFile('image')) {

@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\Seeker\Auth;
 use App\Models\Seeker;
 use Ichtrojan\Otp\Otp;
 use App\Traits\AuthResponse;

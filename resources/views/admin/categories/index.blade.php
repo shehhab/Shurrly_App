@@ -35,7 +35,7 @@
                         <div class="card-header">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h3>All Products</h3>
-                                <a href="{{url('dashboard/add_cats')}}"  class="btn btn-success">
+                                <a href="{{url('dashboard/add_Skills')}}"  class="btn btn-success">
                                     Add new
                                 </a>
                             </div>
@@ -50,7 +50,8 @@
                         <thead>
                         <tr>
                         <th>ID</th>
-                        <th>Name</th>
+                        <th>Skill Name</th>
+                        <th>Catogories</th>
                         <th>create_at</th>
                         <th>Action</th>
                         </tr>
@@ -62,6 +63,7 @@
             <tr>
                 <td>{{ $index + 1 }}</td>
                 <td>{{ $category->name}}</td>
+                <td>n/o</td>
                 <td>{{ $category->created_at}}</td>
                 <td>
 

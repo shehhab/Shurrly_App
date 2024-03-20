@@ -12,7 +12,7 @@ class Cat extends Model
         "name",
         "categories_id"
     ];
-    public function Category()
+    public function category()
     {
         return $this->belongsTo(Category::class);
     }

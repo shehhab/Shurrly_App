@@ -11,11 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('skills', function (Blueprint $table) {
+        Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->boolean('public')->default(false);
-            $table->foreignId('categories_id')->nullable()->references('id')->on('categories');
+            $table->string('title');
+            $table->text('description');
+            $table->decimal('price', 8, 2);
+            $table->time('video_duration')->nullable();
+            $table->integer('pdf_page_count')->nullable();
+            $table->foreignId('advisor_id')->references('id')->on('advisors');
             $table->timestamps();
         });
     }
@@ -25,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('skills');
+        Schema::dropIfExists('products');
     }
 };

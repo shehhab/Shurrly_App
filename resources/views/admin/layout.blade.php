@@ -76,9 +76,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{url('dashboard/all_cats')}}" class="nav-link {{ Request::is('dashboard/all_cats') ? 'active' : '' }}">
+                    <a href="{{url('dashboard/all_Skills')}}" class="nav-link {{ Request::is('dashboard/all_Skills') ? 'active' : '' }}">
                         <i class="far fa-circle nav-icon"></i>
-                        <p>Category</p>
+                        <p>Skills</p>
                     </a>
                 </li>
             </ul>

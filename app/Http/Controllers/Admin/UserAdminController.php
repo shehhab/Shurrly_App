@@ -24,4 +24,19 @@ class UserAdminController extends Controller
     return back();
 }
 
+
+public function destroy($id)
+{
+    $advisor = Advisor::findOrFail($id);
+
+
+    $advisor->skills()->delete();
+
+    $advisor->days()->delete();
+
+    $advisor->delete();
+
+    return redirect()->back()->with('success', 'Advisor deleted successfully');
+}
+
 }

@@ -23,12 +23,16 @@ class CreateAdvisorRequest extends FormRequest
     {
         return [
                 'image'=>['required','image','mimes:jpg,jpeg,png,webp,gif','max:8000'],
-                'expertise'=>['required','max:255'],
                 'certificates'=>['required', 'file', 'mimes:pdf', 'max:50480'],
-                'Offere'=>['required'],
+                'offere'=>['required'],
                 'bio' =>'required|max:255|string',
+                'language' =>'required|string',
+                'country' =>'required|string',
                 'video' => ['required', 'file', 'mimes:mov,pdf,mp4,mp3', 'max:50480'],
                 'available' => ['sometimes','boolean'],
+                'categories_id' => ['required', 'exists:categories,id'],
+
+
                 ];
     }
 }

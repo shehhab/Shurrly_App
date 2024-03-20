@@ -24,4 +24,9 @@ class Day extends Model
     public function seeker(){
         return $this->belongsTo(Seeker::class);
     }
+
+
+    public function advisor(){
+        return $this->belongsTo(Seeker::class);
+    }
 }

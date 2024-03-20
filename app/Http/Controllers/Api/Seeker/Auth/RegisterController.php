@@ -1,10 +1,9 @@
 <?php
-namespace App\Http\Controllers\Api\Auth;
+namespace App\Http\Controllers\Api\Seeker\Auth;
 
 use App\Models\Seeker;
 use Ichtrojan\Otp\Otp;
 use App\Emails\EmailVerification;
-use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
