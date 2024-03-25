@@ -13,7 +13,7 @@ class InitRolesCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'app:role';
+    protected $signature = 'app:init-roles-command';
 
     /**
      * The console command description.
