@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\Advisor\LoginAdvisorController;
 
 use App\Http\Controllers\Api\Seeker\Auth\RegisterController;
 use App\Http\Controllers\Api\Advisor\CreateAdvisorController;
+use App\Http\Controllers\Api\Advisor\GetDataSkillController;
 use App\Http\Controllers\Api\Seeker\Explore\ExploreController;
 use App\Http\Controllers\Api\Seeker\Auth\VerifyEmailController;
 use App\Http\Controllers\Api\Advisor\GetProfileAdvisorController;
@@ -112,10 +113,6 @@ Route::group(['prefix' => 'v1/seeker/auth'], function () {
     Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::apiResource('chat', ChatController::class)->only('index', 'store', 'show');
 
-        Route::apiResource('chat_message', ChatMessageController::class)->only('index', 'store');
-        Route::apiResource('user', SeekerController::class)->only('index');
-
-
         Route::post('/verify_email', VerifyEmailController::class);
         Route::post('/update/profile', UpdateProfileController::class);
         Route::get('/getprofile', GetProfileController::class);
@@ -132,6 +129,7 @@ Route::group(['prefix' => 'v1/seeker/auth'], function () {
 Route::group(['prefix' => 'v1/advisor/auth'], function () {
     Route::post('/login_advisor', LoginAdvisorController::class);
     Route::get('/get_profile_advisor', GetProfileAdvisorController::class);
+    Route::get('/get_skill', GetDataSkillController::class);
 
 
     // API routes for middleware advisor token authentication
