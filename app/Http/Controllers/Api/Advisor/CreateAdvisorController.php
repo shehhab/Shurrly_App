@@ -24,6 +24,7 @@ class CreateAdvisorController extends Controller
             return $this->handleResponse(message: 'Unauthorized', status: false, code: 401);
         }
 
+
         // Check if advisor already updated data
         $existingAdvisor = Advisor::where('seeker_id', $seeker->id)->first();
 
@@ -32,7 +33,12 @@ class CreateAdvisorController extends Controller
         }
 
 
+            foreach ($request->skills as $skillName) {
+                $skillExists = Skill::where(['name' => $skillName])->exists();
 
+                if (!$skillExists) {
+                    return $this->handleResponse(message: 'Skill not found: ' . '('.$skillName.')', status: false, code: 422);
+                }
 
         if (!empty($dayRequest->days)) {
             $advisor = Advisor::create([
@@ -43,19 +49,11 @@ class CreateAdvisorController extends Controller
                 'seeker_id' =>  $seeker->id,
                 'available' => $validatedData['available'],
                 'approved' => false,
-                'categories_id' => $validatedData['categories_id'], 
             ]);
 
-            foreach ($request->skills as $skillName) {
-                // Find or create the skill
-                $skill = Skill::firstOrCreate(['name' => $skillName, 'categories_id' => $validatedData['categories_id']]);
 
-                // Associate the skill with the advisor
-                $advisor->skills()->attach($skill->id);
-            }
-
-            // Associate the advisor with the category
-            $advisor->category()->associate($validatedData['categories_id']);
+            $skill = Skill::where(['name' => $skillName])->first();
+            $advisor->skills()->attach($skill->id);
             $advisor->save();
 
             // Upload image
@@ -92,7 +90,6 @@ class CreateAdvisorController extends Controller
                     $totalBreakTime = abs($breakTo - $breakFrom);
                 }
 
-                // Create Day record
                 $days = Day::create([
                     'day' => $day['day'],
                     'from' => $day['from'],
@@ -108,7 +105,7 @@ class CreateAdvisorController extends Controller
 
             $data = [
                 'message' => new UploadResources($advisor),
-                'days' => new DayResources(['days' => $seeker->days, 'offlineDays']),
+                'days' => new DayResources(['days' => $days, 'offlineDays']),
             ];
 
             return $this->handleResponse(
@@ -119,4 +116,5 @@ class CreateAdvisorController extends Controller
             return $this->handleResponse(message: 'Skills and Days are required', status: false, code: 406);
         }
     }
+}
 }

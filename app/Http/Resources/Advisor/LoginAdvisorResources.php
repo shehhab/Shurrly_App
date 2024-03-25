@@ -25,12 +25,10 @@ class LoginAdvisorResources extends JsonResource
             $media = null;
             $skills = null;
             $certificates = null;
-            $certificatesPages = null;
 
             if ($user) {
                 $media = $user->getFirstMediaUrl('advisor_profile_image');
-                $certificatesPath = $user->getFirstMediaPath('advisor_Certificates_PDF');
-                $certificatesPages = $user->getFirstMediaPath('advisor_Certificates_PDF');
+                $certificates = $user->getFirstMediaUrl('advisor_Certificates_PDF');
 
                 $skills = $user->skills->pluck('name')->toArray();
             }
@@ -45,7 +43,6 @@ class LoginAdvisorResources extends JsonResource
                 "date_birth" => $dateOfBirth,
                 'image' => $media,
                 'certificates' => $certificates,
-                "certificates_pages" => $certificatesPages,
                 "role" => $this->when($this->hasRole('advisor'), 'advisor', 'advisor'),
                 "skills" => $skills,
             ];

@@ -50,7 +50,7 @@ class Advisor extends Model implements HasMedia
 
     public function Day()
     {
-        return $this->hasMany(Day::class);
+        return $this->hasMany(Day::class , 'seeker_id');
     }
 
     public function skills()

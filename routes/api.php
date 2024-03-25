@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Advisor\Chat\ChatAdvisorController;
 use Pusher\Pusher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -42,7 +43,8 @@ use App\Http\Controllers\Api\core\authantication\ForgetPasswordController;
 use App\Http\Controllers\Api\Seeker\Chat\ChatController as ChatChatController;
 use App\Http\Controllers\Api\Seeker\Explore\UnSave_SaveProductController;
 use App\Http\Controllers\Api\Seeker\Explore\ViewProductSavedController;
-use App\Http\Controllers\Chat\{ChatController, ChatMessageController, SeekerController};
+// use App\Http\Controllers\Chat\{ChatController, ChatMessageController, SeekerController};
+use App\Http\Controllers\Api\core\Chat\ChatController;
 /*
     |--------------------------------------------------------------------------
     | API Routes
@@ -85,7 +87,10 @@ Route::middleware(['auth:sanctum'])->prefix('v1')->name('api.')->group(function 
 
         return response($auth);
     });
-    Route::post('seeker-send-message', [ChatChatController::class, 'sendMessage']);
+    Route::get('chats',[ChatController::class,'index']);
+    Route::post('chat-send-message', [ChatController::class, 'sendMessage']);
+    // Route::post('seeker-send-message', [ChatChatController::class, 'sendMessage']);
+    // Route::post('advisor-send-message', [ChatAdvisorController::class, 'sendMessage']);
     Route::get('seeker', fn (Request $request) => $request->user())->name('seeker');;
 });
 
@@ -116,7 +121,6 @@ Route::group(['prefix' => 'v1/seeker/auth'], function () {
         Route::get('/getprofile', GetProfileController::class);
 
         Route::get('/saved_products', ViewProductSavedController::class);
-
     });
 });
 
@@ -135,7 +139,6 @@ Route::group(['prefix' => 'v1/advisor/auth'], function () {
         Route::post('/create_advisor', CreateAdvisorController::class);
         Route::post('/update_profile_advisor', UpdateProfileAdvisorController::class);
         Route::post('/add_products', AddProductController::class);
-
     });
 });
 
@@ -161,18 +164,14 @@ Route::group(['prefix' => 'v1/core/auth'], function () {
 
 Route::group(['prefix' => 'v1/home'], function () {
 
-        Route::get('', HomeController::class);
-        Route::get('/search', SearchController::class);
+    Route::get('', HomeController::class);
+    Route::get('/search', SearchController::class);
 
-        Route::get('/Explore', ExploreController::class);
-        Route::post('/product_page', PageProductController::class);
+    Route::get('/Explore', ExploreController::class);
+    Route::post('/product_page', PageProductController::class);
 
-        Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::post('/save-or-unsave-product', UnSave_SaveProductController::class);
-
-
     });
-
-
 });

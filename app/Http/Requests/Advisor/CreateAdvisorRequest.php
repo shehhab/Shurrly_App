@@ -30,9 +30,6 @@ class CreateAdvisorRequest extends FormRequest
                 'country' =>'required|string',
                 'video' => ['required', 'file', 'mimes:mov,pdf,mp4,mp3', 'max:50480'],
                 'available' => ['sometimes','boolean'],
-                'categories_id' => ['required', 'exists:categories,id'],
-
-
                 ];
     }
 }

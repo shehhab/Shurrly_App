@@ -42,6 +42,7 @@ class NewMessageSent implements ShouldBroadcast
     // 'event' :'chat-message'
     public function broadcastOn()
     {
+        // chat.chatID.chatSeekerId.chatAdvisorId
         return new PresenceChannel('chat.' . $this->chat->id . '.' . $this->chat->seeker_id . '.' . $this->chat->advisor_id);
     }
 

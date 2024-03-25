@@ -30,8 +30,20 @@ class LoginAdvisorController extends Controller
                 // If the user is associated with an Advisor and approval is granted, proceed with authentication
                 if ($advisor->approved == 1 && Auth::attempt(['email' => $validatedData['email'], 'password' => $validatedData['password']])) {
                     // Successful authentication, return the appropriate response
-                    return $this->handleResponse(status:true,message:'Login successful', data: new LoginAdvisorResources(Auth::user()));
-                } elseif ($advisor->approved == 0) {
+                // Get the available days for the advisor
+                $availableDays = $advisor->Day;
+
+                // Successful authentication, return the appropriate response
+                return response()->json([
+                    'status' => true,
+                    'message' => 'Login successful',
+                    'data' => [
+                        'user' => new LoginAdvisorResources(Auth::user()),
+                        'available_days' => new DayResources($availableDays),
+                    ]
+                ]);
+
+            } elseif ($advisor->approved == 0) {
                     // If the account is not approved yet, return a message indicating to wait for approval
                     return $this->handleResponse(status:false, code:403 ,message:'Your account is pending approval. Please wait for confirmation.', data: []);
                 } else {
